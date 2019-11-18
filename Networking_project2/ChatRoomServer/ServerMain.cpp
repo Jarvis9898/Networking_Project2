@@ -93,7 +93,7 @@ void main()
 	}
 
 
-	listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	listenSocket = socket(AF_INET, SOCK_STREAM , IPPROTO_TCP);
 
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -260,7 +260,7 @@ void ParseMsg(Connection* con)
 			stringstream ss;
 			ss << " " << con->socket << " ";
 			BroadcastMsg(roomName, ss.str() + " has joined the room ");
-			SendMsg(con, roomName, " Room Joined ");
+			SendMsg(con, roomName, "Room Joined ");
 			m_Rooms[roomName].push_back(con);
 			break;
 		}
@@ -270,7 +270,7 @@ void ParseMsg(Connection* con)
 			string roomName = con->buffer.deserializeString(roomLength);
 
 			vector<Connection*>::iterator it = find(m_Rooms[roomName].begin(), m_Rooms[roomName].end(), con);
-			SendMsg(con, roomName, " Room Left ");
+			SendMsg(con, roomName, "Room Left ");
 			m_Rooms[roomName].erase(it);
 			stringstream ss;
 			ss << " " << con->socket << " ";
@@ -286,7 +286,7 @@ void ParseMsg(Connection* con)
 			string msg = con->buffer.deserializeString(msgLength);
 			stringstream ss;
 			ss << " " << con->socket << " ";
-			BroadcastMsg(roomName, ss.str() + " has left the room ");
+			BroadcastMsg(roomName, ss.str() + msg);
 			break;
 		}
 	}
@@ -294,12 +294,12 @@ void ParseMsg(Connection* con)
 
 void BroadcastMsg(string roomName, string msg)
 {
-	printf(" BROADCAST %s %s \n", roomName.c_str(), msg.c_str());
+	printf(" Message to all --- %s %s \n", roomName.c_str(), msg.c_str());
 
 	vector<Connection*> roomPopulation = m_Rooms[roomName];
 	for (vector<Connection*>::iterator it = roomPopulation.begin(); it != roomPopulation.end(); it++)
 	{
-		SendMsg(*it, roomName, msg);
+		SendMsg(*it, roomName, msg);	
 	}
 }
 void SendMsg(Connection* con, string s1, string s2)

@@ -19,6 +19,7 @@ public:
 	Buffer(long len);
 	
 	void serializeInt(int x);
+	void serializeInt(int x,int i);
 	void serializeString(string x);
 
 	int deserializeInt();

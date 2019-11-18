@@ -86,7 +86,7 @@ void main()
 	SetConsoleMode(hStdout, l_mode |ENABLE_VIRTUAL_TERMINAL_PROCESSING |DISABLE_NEWLINE_AUTO_RETURN);
 
 	int ch;
-	printf("\x1B[2K\r$");
+	printf("\x1B[2K\r~");
 
 	while (true)
 	{
@@ -100,29 +100,35 @@ void main()
 				printf("\x1B[2K\r");
 				HandleUserInput();
 				message = "";
-				printf("\x1B[2K\r$ %s", message.c_str());
+				printf("\x1B[2K\r~ %s", message.c_str());
 				break;
 			case BACKSPACE:
 				if (!message.empty())
 				{
 					message = message.substr(0, message.length() - 1);
 				}
-				printf("\x1B[2K\r$ %s", message.c_str());
+				printf("\x1B[2K\r~ %s", message.c_str());
 				break;
 			default:
 				message.push_back(ch);
-				printf("\x1B[2K\r$ %s", message.c_str());
+				printf("\x1B[2K\r~ %s", message.c_str());
 				break;
 			}
 		}
 
-		if (serverConn->socket == INVALID_SOCKET) return;
+		if (serverConn->socket == INVALID_SOCKET) continue;
 
 		int result = recv(serverConn->socket, &((char&)(serverConn->buffer[serverConn->bytesReceived])), 512, 0);
+		if (result == SOCKET_ERROR)
+		{
+			if (WSAGetLastError() == WSAEWOULDBLOCK) continue;
+			serverConn->socket = INVALID_SOCKET;
+			continue;
+		}
 		if (result == 0)
 		{
 			closesocket(serverConn->socket);
-			return;
+			continue;
 		}
 
 		serverConn->bytesReceived += result;
@@ -143,10 +149,14 @@ void main()
 			serverConn->buffer.Clear();
 		}
 
+		//printf("%s", message.c_str());
+
 		printf("\x1B[2K\r$ %s", message.c_str());
+		
 	}
 
 }
+
 void Connect()
 {
 	struct sockaddr_in server;
@@ -170,22 +180,23 @@ void Connect()
 			poll.fd = serverConn->socket;
 			poll.events = POLLRDNORM | POLLWRNORM;
 
-			int pollResult;
+			int pollResult;	
 			pollResult = WSAPoll(&poll, 1, 5000);
 			if (!pollResult)
 			{
 				serverConn->socket = INVALID_SOCKET;
 				return;
 			}
-		}
+		}				
 		else
 		{
 			serverConn->socket = INVALID_SOCKET;
 			return;
 		}
-		unsigned long nBlock = 1;
-		result = ioctlsocket(serverConn->socket, FIONBIO, &nBlock);
+		
 	}
+	unsigned long nBlock = 1;
+	int status = ioctlsocket(serverConn->socket, FIONBIO, &nBlock);
 }
 void SerializeMsg(MessageType type, string arg, string msg)
 {
@@ -208,15 +219,15 @@ void SerializeMsg(MessageType type, string arg, string msg)
 	case MessageRoom:
 		serverConn->buffer.serializeInt(arg.length());
 		serverConn->buffer.serializeString(arg);
-		serverConn->buffer.serializeInt(message.length());
-		serverConn->buffer.serializeString(message);
+		serverConn->buffer.serializeInt(msg.length());
+		serverConn->buffer.serializeString(msg);
 		break;
 
 	default:
 		break;
 	}
 
-	serverConn->buffer.serializeInt(serverConn->buffer.writePointer);
+	serverConn->buffer.serializeInt(serverConn->buffer.writePointer,0);
 
 	int result = send(serverConn->socket, &(char&)(serverConn->buffer[0]), serverConn->buffer.writePointer, 0);
 	
@@ -234,12 +245,11 @@ void DeserializeMsg(Connection* con)
 		string roomName = con->buffer.deserializeString(roomLength);
 		int msgLength = con->buffer.deserializeInt();
 		string msg = con->buffer.deserializeString(msgLength);
-		printf("\x1B[2K\r[%s] %s\n", roomName.c_str(), msg.c_str());
+		printf("\x1B[2K\r %s  %s\n", roomName.c_str(), msg.c_str());
 		break;
 	}
 		
 	default:
-		printf("\x1B[2K\rThis wasn't a proper protocol!\n");
 		break;
 	}
 }

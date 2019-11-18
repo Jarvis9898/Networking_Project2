@@ -32,6 +32,16 @@ void Buffer::serializeInt(int x)
 
 }
 
+void Buffer::serializeInt(int x,int i)
+{
+	increase(i, sizeof(x));
+
+	v_Buffer[i] = x;
+	v_Buffer[i + 1] = x >> 8;
+	v_Buffer[i + 2] = x >> 16;
+	v_Buffer[i + 3] = x >> 24;
+}
+
 void Buffer::serializeString(string x)
 {
 	increase(writePointer, sizeof(x));
