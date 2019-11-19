@@ -21,9 +21,21 @@
     <ClCompile Include="Buffer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="protobuf.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protocol.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="protobuf.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol.pb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

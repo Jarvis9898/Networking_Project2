@@ -63,7 +63,9 @@ enum MessageType
 	JoinRoom,
 	LeaveRoom,
 	MessageRoom,
-	ReceiveMessage
+	ReceiveMessage,
+	CreateAccount,
+	AuthenticateAccount
 };
 
 string message;
@@ -223,6 +225,20 @@ void SerializeMsg(MessageType type, string arg, string msg)
 		serverConn->buffer.serializeString(msg);
 		break;
 
+	case CreateAccount:
+		serverConn->buffer.serializeInt(arg.length());
+		serverConn->buffer.serializeString(arg);
+		serverConn->buffer.serializeInt(msg.length());
+		serverConn->buffer.serializeString(msg);
+		break;
+
+	case AuthenticateAccount:
+		serverConn->buffer.serializeInt(arg.length());
+		serverConn->buffer.serializeString(arg);
+		serverConn->buffer.serializeInt(msg.length());
+		serverConn->buffer.serializeString(msg);
+		break;
+
 	default:
 		break;
 	}
@@ -304,6 +320,14 @@ void HandleUserInput()
 	else if (cmd.compare("<<") == 0)
 	{
 		SerializeMsg(MessageRoom, arg, msg);
+	}
+	else if (cmd.compare("SIGNUP") == 0)
+	{
+		SerializeMsg(CreateAccount, arg, msg);
+	}
+	else if (cmd.compare("LOGIN") == 0)
+	{
+		SerializeMsg(AuthenticateAccount, arg, msg);
 	}
 }
 

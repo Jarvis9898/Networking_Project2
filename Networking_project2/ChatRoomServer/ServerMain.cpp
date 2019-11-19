@@ -18,9 +18,10 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #include "Buffer.h"
+#include"protocol.pb.h"
 
 using namespace std;
-
+using namespace gProtocol2;
 
 class Connection
 {
@@ -49,12 +50,15 @@ public:
 };
 
 
+
 enum MessageType
 {
 	JoinRoom,
 	LeaveRoom,
 	MessageRoom,
-	ReceiveMessage
+	ReceiveMessage,
+	CreateAccount,
+	AuthenticateAccount
 };
 
 map<string, vector<Connection*>> m_Rooms;
@@ -70,9 +74,11 @@ int port = 5858;
 WSAData wsaData;
 SOCKADDR_IN	addr;
 int result;
-
+SOCKET Asocket;
 int iResult;
-
+void ConnectToAuthenticationService();
+void CreateAccount(Connection *con,string email,string pass);
+void AuthenticateAccount(Connection* con, string email, string pass);
 bool CheckNewConnection();
 void ReceiveMsg(Connection *con, int i);
 void NewClient(SOCKET s);
@@ -152,7 +158,47 @@ void main()
 
 	return;
 }
+void ConnectToAuthenticationService()
+{
+	struct sockaddr_in server;
+	struct hostent* host;
 
+	Asocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	server.sin_family = AF_INET;
+	server.sin_port = htons(5858);
+	server.sin_addr.s_addr = inet_addr("127.0.0.1");
+	if (server.sin_addr.s_addr == INADDR_NONE)
+	{
+		host = gethostbyname("127.0.0.1");
+		CopyMemory(&server.sin_addr, host->h_addr_list[0], host->h_length);
+	}
+	int result = connect(Asocket, (struct sockaddr*) & server, sizeof(server));
+	if (result == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() == WSAEWOULDBLOCK)
+		{
+			pollfd poll;
+			poll.fd = Asocket;
+			poll.events = POLLRDNORM | POLLWRNORM;
+
+			int pollResult;
+			pollResult = WSAPoll(&poll, 1, 5000);
+			if (!pollResult)
+			{
+				Asocket = INVALID_SOCKET;
+				return;
+			}
+		}
+		else
+		{
+			Asocket = INVALID_SOCKET;
+			return;
+		}
+
+	}
+	unsigned long nBlock = 1;
+	int status = ioctlsocket(Asocket, FIONBIO, &nBlock);
+}
 bool CheckNewConnection()
 {
 	if (!FD_ISSET(listenSocket, &readSet)) return false;
@@ -289,7 +335,64 @@ void ParseMsg(Connection* con)
 			BroadcastMsg(roomName, ss.str() + msg);
 			break;
 		}
+
+		case  MessageType::CreateAccount:
+		{
+
+			int emailLength = con->buffer.deserializeInt();
+			string email = con->buffer.deserializeString(emailLength);
+			int passLength = con->buffer.deserializeInt();
+			string pass = con->buffer.deserializeString(passLength);
+			CreateAccount(con, email, pass);
+			break;
+		}
+
+		case  MessageType::AuthenticateAccount:
+		{
+			int emailLength = con->buffer.deserializeInt();
+			string email = con->buffer.deserializeString(emailLength);
+			int passLength = con->buffer.deserializeInt();
+			string pass = con->buffer.deserializeString(passLength);
+			AuthenticateAccount(con, email, pass);
+			break;
+		}
 	}
+}
+void CreateAccount(Connection* con, string email, string pass)
+{
+	GoogleBuffer* gBuffer;
+	
+	GoogleBuffer_msgType GoogleBuffer_msgType_CREATE;
+
+	gBuffer->set_type(GoogleBuffer_msgType_CREATE);
+	gBuffer->set_requestid(con->socket);
+	gBuffer->set_email(email.c_str());
+	gBuffer->set_plaintextpassword(pass.c_str());
+
+	string buf = gBuffer->SerializeAsString();
+
+	int result = send(Asocket, &buf[0], 512, 0);
+	int result = recv(Asocket, &buf[0], 512, 0);
+	if (result == SOCKET_ERROR)
+	{
+		int WSAErrorCode = WSAGetLastError();
+
+		if (WSAErrorCode != WSAEWOULDBLOCK)
+		{
+			return;
+		}
+		if (WSAErrorCode == WSAEHOSTUNREACH)
+		{
+			printf("Disconnected from server...\n");
+		}
+		return;
+	}
+
+}
+
+void AuthenticateAccount(Connection* con, string email, string pass)
+{
+
 }
 
 void BroadcastMsg(string roomName, string msg)

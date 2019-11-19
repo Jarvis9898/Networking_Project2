@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package gProtocol2;
+
+message GoogleBuffer{
+	
+	enum msgType{
+		CREATE = 0;
+		AUTHENTICATE = 1;
+
+	}
+
+	enum reason {
+			ACCOUNT_ALREADY_EXISTS = 0;
+			INVALID_PASSWORD = 1;
+			INTERNAL_SERVER_ERROR = 2;
+			INVALID_CREDENTIALS = 3;
+		
+		}
+
+	optional int32 requestId = 1;
+	optional string email = 2;
+	optional string plaintextPassword = 3;
+	optional int32 userId = 4;
+	optional string creationDate = 5;
+	optional msgType type = 6;
+	optional reason r = 7;
+
+
+	
+}
