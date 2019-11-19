@@ -1,10 +1,9 @@
 #define HEADER 8
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
-#include <Windows.h>
-
 #include <ws2tcpip.h>
+#include <Windows.h>
 #include <iphlpapi.h>
-
 #include <stdio.h>
 #include <cstdlib>
 #include <cstring>
@@ -57,8 +56,8 @@ enum MessageType
 	LeaveRoom,
 	MessageRoom,
 	ReceiveMessage,
-	CreateAccount,
-	AuthenticateAccount
+	Signup,
+	Login
 };
 
 map<string, vector<Connection*>> m_Rooms;
@@ -336,7 +335,7 @@ void ParseMsg(Connection* con)
 			break;
 		}
 
-		case  MessageType::CreateAccount:
+		case  MessageType::Signup:
 		{
 
 			int emailLength = con->buffer.deserializeInt();
@@ -347,7 +346,7 @@ void ParseMsg(Connection* con)
 			break;
 		}
 
-		case  MessageType::AuthenticateAccount:
+		case  MessageType::Login:
 		{
 			int emailLength = con->buffer.deserializeInt();
 			string email = con->buffer.deserializeString(emailLength);
@@ -360,19 +359,17 @@ void ParseMsg(Connection* con)
 }
 void CreateAccount(Connection* con, string email, string pass)
 {
-	GoogleBuffer* gBuffer;
+	GoogleBuffer gBuffer;
 	
-	GoogleBuffer_msgType GoogleBuffer_msgType_CREATE;
+	gBuffer.set_type(GoogleBuffer::CREATE);
+	gBuffer.set_requestid(con->socket);
+	gBuffer.set_email(email.c_str());
+	gBuffer.set_plaintextpassword(pass.c_str());
 
-	gBuffer->set_type(GoogleBuffer_msgType_CREATE);
-	gBuffer->set_requestid(con->socket);
-	gBuffer->set_email(email.c_str());
-	gBuffer->set_plaintextpassword(pass.c_str());
-
-	string buf = gBuffer->SerializeAsString();
+	string buf = gBuffer.SerializeAsString();
 
 	int result = send(Asocket, &buf[0], 512, 0);
-	int result = recv(Asocket, &buf[0], 512, 0);
+	result = recv(Asocket, &buf[0], 512, 0);
 	if (result == SOCKET_ERROR)
 	{
 		int WSAErrorCode = WSAGetLastError();
@@ -392,7 +389,34 @@ void CreateAccount(Connection* con, string email, string pass)
 
 void AuthenticateAccount(Connection* con, string email, string pass)
 {
+	GoogleBuffer gBuffer;
 
+
+	//GoogleBuffer_msgType GoogleBuffer_msgType_CREATE ;
+
+	gBuffer.set_type(GoogleBuffer::AUTHENTICATE);
+	gBuffer.set_requestid(con->socket);
+	gBuffer.set_email(email.c_str());
+	gBuffer.set_plaintextpassword(pass.c_str());
+
+	string buf = gBuffer.SerializeAsString();
+
+	int result = send(Asocket, &buf[0], 512, 0);
+	result = recv(Asocket, &buf[0], 512, 0);
+	if (result == SOCKET_ERROR)
+	{
+		int WSAErrorCode = WSAGetLastError();
+
+		if (WSAErrorCode != WSAEWOULDBLOCK)
+		{
+			return;
+		}
+		if (WSAErrorCode == WSAEHOSTUNREACH)
+		{
+			printf("Disconnected from server...\n");
+		}
+		return;
+	}
 }
 
 void BroadcastMsg(string roomName, string msg)

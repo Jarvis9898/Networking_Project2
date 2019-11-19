@@ -27,9 +27,7 @@
 
 #include "Buffer.h"
 
-
 using namespace std;
-
 
 class Connection
 {
@@ -58,15 +56,17 @@ public:
 };
 
 
+
 enum MessageType
 {
 	JoinRoom,
 	LeaveRoom,
 	MessageRoom,
 	ReceiveMessage,
-	CreateAccount,
-	AuthenticateAccount
+	Signup,
+	Login
 };
+
 
 string message;
 
@@ -80,6 +80,7 @@ void Connect();
 void Disconnect();
 void SerializeMsg(MessageType type, string arg, string msg);
 void DeserializeMsg(Connection* con);
+
 void main()
 {
 	DWORD l_mode;
@@ -225,14 +226,14 @@ void SerializeMsg(MessageType type, string arg, string msg)
 		serverConn->buffer.serializeString(msg);
 		break;
 
-	case CreateAccount:
+	case Signup:
 		serverConn->buffer.serializeInt(arg.length());
 		serverConn->buffer.serializeString(arg);
 		serverConn->buffer.serializeInt(msg.length());
 		serverConn->buffer.serializeString(msg);
 		break;
 
-	case AuthenticateAccount:
+	case Login:
 		serverConn->buffer.serializeInt(arg.length());
 		serverConn->buffer.serializeString(arg);
 		serverConn->buffer.serializeInt(msg.length());
@@ -317,17 +318,17 @@ void HandleUserInput()
 	{
 		SerializeMsg(LeaveRoom, arg, msg);
 	}
-	else if (cmd.compare("<<") == 0)
+	else if (cmd.compare("SEND") == 0)
 	{
 		SerializeMsg(MessageRoom, arg, msg);
 	}
-	else if (cmd.compare("SIGNUP") == 0)
+	else if (cmd.compare("REGISTER") == 0)
 	{
-		SerializeMsg(CreateAccount, arg, msg);
+		SerializeMsg(Signup, arg, msg);
 	}
-	else if (cmd.compare("LOGIN") == 0)
+	else if (cmd.compare("AUTHENTICATE") == 0)
 	{
-		SerializeMsg(AuthenticateAccount, arg, msg);
+		SerializeMsg(Login, arg, msg);
 	}
 }
 

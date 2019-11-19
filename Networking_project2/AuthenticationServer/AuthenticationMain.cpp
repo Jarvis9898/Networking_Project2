@@ -81,13 +81,11 @@ int port = 9898;
 FD_SET readSet;
 
 void ParseMessage(string buf);
-bool CreateAccout(GoogleBuffer* msg);
+bool CreateAccount(GoogleBuffer* msg);
 bool Authenticate(GoogleBuffer* msg);
 void CreateTable();
 void main()
 {
-
-	
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0)
 	{
@@ -112,7 +110,6 @@ void main()
 
 		con->setSchema(schema);
 		cout << "Successfully set our schema !!" << endl;
-
 	}
 	catch (SQLException & execption)
 	{
@@ -144,9 +141,8 @@ void main()
 		acceptSocket = accept(listenSocket, NULL, NULL);
 		unsigned long nBlock = 1;
 
-		
-
 		int result = ioctlsocket(acceptSocket, FIONBIO, &nBlock);
+
 		result = recv(acceptSocket, &buffer[0] , 512, 0);
 
 		if (result == SOCKET_ERROR)
@@ -173,25 +169,26 @@ void main()
 
 void ParseMessage(string buf)
 {
-	GoogleBuffer* msg;
+	GoogleBuffer msg;
 
-	msg->ParseFromString(buf);
+
+	msg.ParseFromString(buf);
 
 	GoogleBuffer_msgType typ;
 
 
-	typ = msg->type();
+	typ = msg.type();
 
-	if (typ == GoogleBuffer_msgType_CREATE)
+	if (typ == GoogleBuffer::CREATE)
 	{
-		if (!CreateAccout(msg))
+		if (!CreateAccount(&msg))
 		{
 			return;
 		}
 	}
-	else if (typ == GoogleBuffer_msgType_AUTHENTICATE)
+	else if (typ == GoogleBuffer::AUTHENTICATE)
 	{
-		if (!Authenticate(msg))
+		if (!Authenticate(&msg))
 		{
 			return;
 		}
