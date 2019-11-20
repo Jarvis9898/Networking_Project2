@@ -69,6 +69,7 @@ map<string, vector<Connection*>> m_Rooms;
 
 FD_SET readSet;
 
+
 SOCKET listenSocket = INVALID_SOCKET;
 SOCKET acceptSocket = INVALID_SOCKET;
 
@@ -97,6 +98,7 @@ void main()
 	
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	FD_ZERO(&readSet);
+
 
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0)
@@ -130,8 +132,10 @@ void main()
 
 		
 		FD_ZERO(&readSet);
+		
 		FD_SET(listenSocket, &readSet);
-
+		
+		
 		
 		for (int i = 0; i < totalS; i++)
 		{
@@ -160,7 +164,10 @@ void main()
 				ReceiveMsg(con, i);
 			}
 		}
+		
+		
 		ReceiveFromService();
+		
 	}
 
 	system("Pause");
@@ -171,12 +178,13 @@ void main()
 void ReceiveFromService()
 {
 	string buf;
+	if (Asocket == INVALID_SOCKET) return;
 
 	int result = recv(Asocket, &buf[0], 512, 0);
 
 	if (result == SOCKET_ERROR)
 	{
-		int WSAErrorCode = WSAGetLastError();
+		/*int WSAErrorCode = WSAGetLastError();
 
 		if (WSAErrorCode != WSAEWOULDBLOCK)
 		{
@@ -184,13 +192,17 @@ void ReceiveFromService()
 		}
 		if (WSAErrorCode == WSAEHOSTUNREACH)
 		{
-			printf("Disconnected from Service...\n");
+			printf("Disconnected from Service...1\n");
 		}
+		return;*/
+
+		if (WSAGetLastError() == WSAEWOULDBLOCK) return;	
+		Asocket = INVALID_SOCKET;
 		return;
 	}
 	if (result == 0)
 	{
-		cout << "Disconnected from Service...";
+		//cout << "Disconnected from Service...2";
 		return;
 	}
 
@@ -240,7 +252,7 @@ void ConnectToAuthenticationService()
 
 	Asocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	server.sin_family = AF_INET;
-	server.sin_port = htons(5858);
+	server.sin_port = htons(9898);
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	if (server.sin_addr.s_addr == INADDR_NONE)
 	{
@@ -273,6 +285,7 @@ void ConnectToAuthenticationService()
 	}
 	unsigned long nBlock = 1;
 	int status = ioctlsocket(Asocket, FIONBIO, &nBlock);
+	cout << "\n Connected to Authentication Service...\n";
 }
 
 bool CheckNewConnection()

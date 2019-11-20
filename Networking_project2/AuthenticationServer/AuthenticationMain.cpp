@@ -65,7 +65,7 @@ PreparedStatement* pstmt;
 ResultSet* rs;
 
 string buffer;
-string server = "127.0.0.1:9988";
+string server = "127.0.0.1:3306";
 string username = "root";
 string password = "root";
 string schema = "project2";
