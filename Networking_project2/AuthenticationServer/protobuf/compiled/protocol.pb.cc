@@ -68,16 +68,17 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_protocol_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016protocol.proto\022\ngProtocol2\"\346\002\n\014GoogleB"
+  "\n\016protocol.proto\022\ngProtocol2\"\215\003\n\014GoogleB"
   "uffer\022\021\n\trequestId\030\001 \001(\005\022\r\n\005email\030\002 \001(\t\022"
   "\031\n\021plaintextPassword\030\003 \001(\t\022\016\n\006userId\030\004 \001"
   "(\005\022\024\n\014creationDate\030\005 \001(\t\022.\n\004type\030\006 \001(\0162 "
   ".gProtocol2.GoogleBuffer.msgType\022*\n\001r\030\007 "
-  "\001(\0162\037.gProtocol2.GoogleBuffer.reason\"\'\n\007"
-  "msgType\022\n\n\006CREATE\020\000\022\020\n\014AUTHENTICATE\020\001\"n\n"
-  "\006reason\022\032\n\026ACCOUNT_ALREADY_EXISTS\020\000\022\024\n\020I"
-  "NVALID_PASSWORD\020\001\022\031\n\025INTERNAL_SERVER_ERR"
-  "OR\020\002\022\027\n\023INVALID_CREDENTIALS\020\003"
+  "\001(\0162\037.gProtocol2.GoogleBuffer.reason\"N\n\007"
+  "msgType\022\n\n\006CREATE\020\000\022\020\n\014AUTHENTICATE\020\001\022\021\n"
+  "\rLOGIN_SUCCESS\020\002\022\022\n\016SIGNUP_SUCCESS\020\003\"n\n\006"
+  "reason\022\032\n\026ACCOUNT_ALREADY_EXISTS\020\000\022\024\n\020IN"
+  "VALID_PASSWORD\020\001\022\031\n\025INTERNAL_SERVER_ERRO"
+  "R\020\002\022\027\n\023INVALID_CREDENTIALS\020\003"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_protocol_2eproto_deps[1] = {
 };
@@ -87,7 +88,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pro
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_protocol_2eproto_once;
 static bool descriptor_table_protocol_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_protocol_2eproto = {
-  &descriptor_table_protocol_2eproto_initialized, descriptor_table_protodef_protocol_2eproto, "protocol.proto", 389,
+  &descriptor_table_protocol_2eproto_initialized, descriptor_table_protodef_protocol_2eproto, "protocol.proto", 428,
   &descriptor_table_protocol_2eproto_once, descriptor_table_protocol_2eproto_sccs, descriptor_table_protocol_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_protocol_2eproto::offsets,
   file_level_metadata_protocol_2eproto, 1, file_level_enum_descriptors_protocol_2eproto, file_level_service_descriptors_protocol_2eproto,
@@ -104,6 +105,8 @@ bool GoogleBuffer_msgType_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
+    case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -113,6 +116,8 @@ bool GoogleBuffer_msgType_IsValid(int value) {
 #if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 constexpr GoogleBuffer_msgType GoogleBuffer::CREATE;
 constexpr GoogleBuffer_msgType GoogleBuffer::AUTHENTICATE;
+constexpr GoogleBuffer_msgType GoogleBuffer::LOGIN_SUCCESS;
+constexpr GoogleBuffer_msgType GoogleBuffer::SIGNUP_SUCCESS;
 constexpr GoogleBuffer_msgType GoogleBuffer::msgType_MIN;
 constexpr GoogleBuffer_msgType GoogleBuffer::msgType_MAX;
 constexpr int GoogleBuffer::msgType_ARRAYSIZE;

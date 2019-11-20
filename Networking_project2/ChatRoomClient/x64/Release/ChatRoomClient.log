@@ -1,0 +1,23 @@
+﻿  Buffer.cpp
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\Buffer.cpp(48,22): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  ClientMain.cpp
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\Buffer.cpp(70,16): warning C4244: 'argument': conversion from 'long' to 'const _Elem', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\Buffer.cpp(70,16): warning C4244:         with
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\Buffer.cpp(70,16): warning C4244:         [
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\Buffer.cpp(70,16): warning C4244:             _Elem=char
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\Buffer.cpp(70,16): warning C4244:         ]
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(85,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(213,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(218,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(223,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(225,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(230,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(232,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(237,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(239,47): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\ChatRoomClient\ClientMain.cpp(280,28): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 182 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  ChatRoomClient.vcxproj -> C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\x64\Release\ChatRoomClient.exe

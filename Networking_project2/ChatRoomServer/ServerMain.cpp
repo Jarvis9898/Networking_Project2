@@ -30,13 +30,16 @@ public:
 	Buffer buffer;
 	int bytesReceived;
 	int length;
-	
+	bool signedUp;
+	bool loggedIn;
 	Connection()
 	{
 		socket = INVALID_SOCKET;
 		buffer.Clear();
 		bytesReceived = 0;
 		length = 0;
+		signedUp = false;
+		loggedIn = false;
 	}
 	Connection(SOCKET s)
 	{
@@ -44,6 +47,8 @@ public:
 		buffer = Buffer(512);
 		bytesReceived = 0;
 		length = 0;
+		signedUp = false;
+		loggedIn = false;
 	}
 
 };
@@ -85,10 +90,12 @@ void ParseMsg(Connection *con);
 void RemoveClient(int index);
 void BroadcastMsg(string roomName, string msg);
 void SendMsg(Connection* con, string s1, string s2);
+void ReceiveFromService();
+void ParseMsgFromService(string buf);
 void main()
 {
 	
-
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	FD_ZERO(&readSet);
 
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -108,6 +115,8 @@ void main()
 	result = listen(listenSocket, 5);
 	unsigned long nBlock = 1;
 	result = ioctlsocket(listenSocket, FIONBIO, &nBlock);
+
+	ConnectToAuthenticationService();
 
 	while (true)
 	{
@@ -151,11 +160,78 @@ void main()
 				ReceiveMsg(con, i);
 			}
 		}
+		ReceiveFromService();
 	}
 
 	system("Pause");
 
 	return;
+}
+
+void ReceiveFromService()
+{
+	string buf;
+
+	int result = recv(Asocket, &buf[0], 512, 0);
+
+	if (result == SOCKET_ERROR)
+	{
+		int WSAErrorCode = WSAGetLastError();
+
+		if (WSAErrorCode != WSAEWOULDBLOCK)
+		{
+			return;
+		}
+		if (WSAErrorCode == WSAEHOSTUNREACH)
+		{
+			printf("Disconnected from Service...\n");
+		}
+		return;
+	}
+	if (result == 0)
+	{
+		cout << "Disconnected from Service...";
+		return;
+	}
+
+	ParseMsgFromService(buf);
+
+}
+
+void ParseMsgFromService(string buf)
+{
+	GoogleBuffer msg;
+	int socketID;
+	msg.ParseFromString(buf);
+	GoogleBuffer_msgType typ;
+	typ = msg.type();
+
+	if(typ == GoogleBuffer::SIGNUP_SUCCESS)
+	{ 
+		socketID = msg.requestid();
+		for (int i = 0; i < totalS; i++)
+		{
+			if ((int)(allConnections[i]->socket) == socketID)
+			{
+				allConnections[i]->signedUp = true;
+
+				SendMsg(allConnections[i], "Server", "Your Account is created.....");
+			}
+		}
+	}
+	else if(typ == GoogleBuffer::LOGIN_SUCCESS)
+	{
+		socketID = msg.requestid();
+		for (int i = 0; i < totalS; i++)
+		{
+			if ((int)(allConnections[i]->socket) == socketID)
+			{
+				allConnections[i]->loggedIn = true;
+
+				SendMsg(allConnections[i], "Server", "Your are Authenticated...");
+			}
+		}
+	}
 }
 void ConnectToAuthenticationService()
 {
@@ -198,6 +274,7 @@ void ConnectToAuthenticationService()
 	unsigned long nBlock = 1;
 	int status = ioctlsocket(Asocket, FIONBIO, &nBlock);
 }
+
 bool CheckNewConnection()
 {
 	if (!FD_ISSET(listenSocket, &readSet)) return false;
@@ -369,7 +446,7 @@ void CreateAccount(Connection* con, string email, string pass)
 	string buf = gBuffer.SerializeAsString();
 
 	int result = send(Asocket, &buf[0], 512, 0);
-	result = recv(Asocket, &buf[0], 512, 0);
+	//result = recv(Asocket, &buf[0], 512, 0);
 	if (result == SOCKET_ERROR)
 	{
 		int WSAErrorCode = WSAGetLastError();
@@ -402,7 +479,7 @@ void AuthenticateAccount(Connection* con, string email, string pass)
 	string buf = gBuffer.SerializeAsString();
 
 	int result = send(Asocket, &buf[0], 512, 0);
-	result = recv(Asocket, &buf[0], 512, 0);
+	//result = recv(Asocket, &buf[0], 512, 0);
 	if (result == SOCKET_ERROR)
 	{
 		int WSAErrorCode = WSAGetLastError();

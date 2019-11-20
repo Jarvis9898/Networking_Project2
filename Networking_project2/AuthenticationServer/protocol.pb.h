@@ -67,11 +67,13 @@ namespace gProtocol2 {
 
 enum GoogleBuffer_msgType : int {
   GoogleBuffer_msgType_CREATE = 0,
-  GoogleBuffer_msgType_AUTHENTICATE = 1
+  GoogleBuffer_msgType_AUTHENTICATE = 1,
+  GoogleBuffer_msgType_LOGIN_SUCCESS = 2,
+  GoogleBuffer_msgType_SIGNUP_SUCCESS = 3
 };
 bool GoogleBuffer_msgType_IsValid(int value);
 constexpr GoogleBuffer_msgType GoogleBuffer_msgType_msgType_MIN = GoogleBuffer_msgType_CREATE;
-constexpr GoogleBuffer_msgType GoogleBuffer_msgType_msgType_MAX = GoogleBuffer_msgType_AUTHENTICATE;
+constexpr GoogleBuffer_msgType GoogleBuffer_msgType_msgType_MAX = GoogleBuffer_msgType_SIGNUP_SUCCESS;
 constexpr int GoogleBuffer_msgType_msgType_ARRAYSIZE = GoogleBuffer_msgType_msgType_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* GoogleBuffer_msgType_descriptor();
@@ -230,6 +232,10 @@ class GoogleBuffer :
     GoogleBuffer_msgType_CREATE;
   static constexpr msgType AUTHENTICATE =
     GoogleBuffer_msgType_AUTHENTICATE;
+  static constexpr msgType LOGIN_SUCCESS =
+    GoogleBuffer_msgType_LOGIN_SUCCESS;
+  static constexpr msgType SIGNUP_SUCCESS =
+    GoogleBuffer_msgType_SIGNUP_SUCCESS;
   static inline bool msgType_IsValid(int value) {
     return GoogleBuffer_msgType_IsValid(value);
   }

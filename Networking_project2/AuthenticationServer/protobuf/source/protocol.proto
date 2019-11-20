@@ -7,7 +7,8 @@ message GoogleBuffer{
 	enum msgType{
 		CREATE = 0;
 		AUTHENTICATE = 1;
-
+		LOGIN_SUCCESS = 2;
+		SIGNUP_SUCCESS = 3;
 	}
 
 	enum reason {

@@ -86,6 +86,7 @@ bool Authenticate(GoogleBuffer* msg);
 void CreateTable();
 void main()
 {
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0)
 	{
@@ -151,7 +152,6 @@ void main()
 
 			if (WSAErrorCode != WSAEWOULDBLOCK)
 			{
-				
 				continue;
 			}
 			if (WSAErrorCode == WSAEHOSTUNREACH)
@@ -183,15 +183,28 @@ void ParseMessage(string buf)
 	{
 		if (!CreateAccount(&msg))
 		{
+			
+			msg.set_r(GoogleBuffer::INTERNAL_SERVER_ERROR);
+			buf = msg.SerializeAsString();
+			result = send(acceptSocket, &buf[0], 512, 0);
 			return;
 		}
+		msg.set_type(GoogleBuffer::SIGNUP_SUCCESS);
+		buf = msg.SerializeAsString();
+		result = send(acceptSocket, &buf[0], 512, 0);
 	}
 	else if (typ == GoogleBuffer::AUTHENTICATE)
 	{
 		if (!Authenticate(&msg))
 		{
+			msg.set_r(GoogleBuffer::INVALID_CREDENTIALS);
+			buf = msg.SerializeAsString();
+			result = send(acceptSocket, &buf[0], 512, 0);
 			return;
 		}
+		msg.set_type(GoogleBuffer::LOGIN_SUCCESS);
+		buf = msg.SerializeAsString();
+		result = send(acceptSocket, &buf[0], 512, 0);
 	}
 	
 }
