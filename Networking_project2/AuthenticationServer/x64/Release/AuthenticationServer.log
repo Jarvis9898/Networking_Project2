@@ -1,3 +1,0 @@
-﻿  AuthenticationMain.cpp
-C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\AuthenticationServer\AuthenticationMain.cpp(88,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
-LINK : fatal error LNK1104: cannot open file 'C:\College Stuff\Code\Network_Programming\Project2\Networking_Project2\Networking_project2\x64\Release\AuthenticationServer.exe'
